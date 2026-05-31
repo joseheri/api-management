@@ -1,5 +1,7 @@
 package com.lmco.jsf.fmt.dataprovider.security.apikey.resource;
 
+import com.lmco.jsf.fmt.dataprovider.common.response.ApiResponse;
+import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ApiClientResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.CreateApiClientRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.DisableApiClientRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.service.ApiClientService;
@@ -12,6 +14,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.List;
 
 @Path("/api/v1/admin/api-clients")
 @Produces(MediaType.APPLICATION_JSON)
@@ -30,7 +33,8 @@ public class ApiClientResource {
 
     @GET
     public Response listClients() {
-        return Response.ok(apiClientService.listClients()).build();
+        List<ApiClientResponse> clients = apiClientService.listClients();
+        return Response.ok(ApiResponse.of(clients)).build();
     }
 
     @GET

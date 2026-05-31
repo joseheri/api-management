@@ -1,5 +1,7 @@
 package com.lmco.jsf.fmt.dataprovider.security.apikey.resource;
 
+import com.lmco.jsf.fmt.dataprovider.common.response.ApiResponse;
+import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ApiKeyMetadataResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.CreateClaimInvitationRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.RevokeApiKeyRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.RotateApiKeyRequest;
@@ -14,6 +16,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.List;
 
 @Path("/api/v1/admin/api-keys")
 @Produces(MediaType.APPLICATION_JSON)
@@ -39,7 +42,8 @@ public class ApiKeyManagementResource {
     @GET
     @Path("/clients/{clientId}")
     public Response listKeysForClient(@PathParam("clientId") Long clientId) {
-        return Response.ok(apiKeyService.listKeysForClient(clientId)).build();
+        List<ApiKeyMetadataResponse> keys = apiKeyService.listKeysForClient(clientId);
+        return Response.ok(ApiResponse.of(keys)).build();
     }
 
     @GET
@@ -57,6 +61,8 @@ public class ApiKeyManagementResource {
     @POST
     @Path("/{keyId}/rotate")
     public Response rotateKey(@PathParam("keyId") Long keyId, RotateApiKeyRequest request) {
-        return Response.ok(apiKeyService.rotateKey(keyId, request)).build();
+        return Response.status(Response.Status.CREATED)
+                .entity(apiKeyService.rotateKey(keyId, request))
+                .build();
     }
 }
