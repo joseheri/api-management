@@ -1,0 +1,56 @@
+# Build output
+target/
+build/
+out/
+
+# Quarkus
+.quarkus/
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+dependency-reduced-pom.xml
+
+# Logs
+*.log
+logs/
+
+# Local environment and secrets
+.env
+.env.*
+*.local
+*.secret
+*.key
+*.pem
+
+# IDE/editor files
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Java artifacts
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+replay_pid*
+
+# Test and coverage output
+surefire-reports/
+failsafe-reports/
+jacoco.exec
+coverage/
+
+# Native image output
+*-runner
+*-runner.exe
+*.build_artifacts.txt
