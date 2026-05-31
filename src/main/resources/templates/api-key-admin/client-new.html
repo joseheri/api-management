@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>New API Client</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <header>
+    <h1>New API Client</h1>
+    <div class="nav">
+      <a href="/admin/ui/api-clients">Clients</a>
+      <a href="/key-claim/ui">Claim API Key</a>
+    </div>
+  </header>
+  <main>
+    <p class="warning">Admin UI access currently relies on the dev/test <code>X-Dev-Admin-User</code> header and is not production authentication.</p>
+    <form class="panel" method="post" action="/admin/ui/api-clients">
+      <label for="clientName">Client Name</label>
+      <input id="clientName" name="clientName" required>
+
+      <label for="contactEmail">Contact Email / Claim Identifier Contact</label>
+      <input id="contactEmail" name="contactEmail" required>
+
+      <label for="owner">Owner</label>
+      <input id="owner" name="owner">
+
+      <div class="actions">
+        <button type="submit">Create Client</button>
+        <a class="button secondary" href="/admin/ui/api-clients">Cancel</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

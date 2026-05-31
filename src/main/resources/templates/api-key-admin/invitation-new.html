@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>New Claim Invitation</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <header>
+    <h1>New Claim Invitation</h1>
+    <div class="nav">
+      <a href="/admin/ui/api-clients">Clients</a>
+      <a href="/admin/ui/api-clients/{client.id}">Client Details</a>
+      <a href="/key-claim/ui">Claim API Key</a>
+    </div>
+  </header>
+  <main>
+    <p class="warning">Admin UI access currently relies on the dev/test <code>X-Dev-Admin-User</code> header and is not production authentication. No email is sent by this workflow.</p>
+    <form class="panel" method="post" action="/admin/ui/api-clients/{client.id}/claim-invitations">
+      <p><strong>Client:</strong> {client.clientName} ({client.contactEmail})</p>
+
+      <label for="approvedEmail">Approved Email / Claim Identifier</label>
+      <input id="approvedEmail" name="approvedEmail" required>
+
+      <label for="keyName">Key Name</label>
+      <input id="keyName" name="keyName" required>
+
+      <label for="environment">Environment</label>
+      <select id="environment" name="environment" required>
+        {#for environment in environments}
+        <option value="{environment}">{environment}</option>
+        {/for}
+      </select>
+
+      <label>Scopes</label>
+      <div class="checkbox-list">
+        {#for scope in scopes}
+        <label><input type="checkbox" name="scopes" value="{scope}"> {scope}</label>
+        {/for}
+      </div>
+
+      <label for="expiresAt">Expires At</label>
+      <input id="expiresAt" name="expiresAt" value="{defaultExpiresAt}" required>
+      <p class="muted">Use an ISO-8601 instant such as <code>{defaultExpiresAt}</code>.</p>
+
+      <label for="approvalReference">Approval Reference</label>
+      <input id="approvalReference" name="approvalReference">
+
+      <div class="actions">
+        <button type="submit">Create Invitation</button>
+        <a class="button secondary" href="/admin/ui/api-clients/{client.id}">Cancel</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

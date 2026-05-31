@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Claim API Key</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <header>
+    <h1>Claim API Key</h1>
+  </header>
+  <main>
+    <p class="warning">Enter the approved email / claim identifier and claim code provided through the internal out-of-band process. No claim code or API key is placed in the URL.</p>
+    <form class="panel" method="post" action="/key-claim/ui/complete">
+      <label for="approvedEmail">Approved Email / Claim Identifier</label>
+      <input id="approvedEmail" name="approvedEmail" required>
+
+      <label for="claimCode">Claim Code</label>
+      <input id="claimCode" name="claimCode" autocomplete="off" required>
+
+      <div class="actions">
+        <button type="submit">Complete Claim</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

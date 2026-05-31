@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>API Client {client.id}</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <header>
+    <h1>{client.clientName}</h1>
+    <div class="nav">
+      <a href="/admin/ui/api-clients">Clients</a>
+      <a href="/admin/ui/api-clients/{client.id}/claim-invitations/new">New Claim Invitation</a>
+      <a href="/key-claim/ui">Claim API Key</a>
+    </div>
+  </header>
+  <main>
+    <p class="warning">Admin UI access currently relies on the dev/test <code>X-Dev-Admin-User</code> header and is not production authentication.</p>
+    {#if notice}
+    <p class="notice">{notice}</p>
+    {/if}
+
+    <section class="panel">
+      <h2>Client Details</h2>
+      <p><strong>ID:</strong> {client.id}</p>
+      <p><strong>Contact:</strong> {client.contactEmail}</p>
+      <p><strong>Owner:</strong> {client.owner}</p>
+      <p><strong>Status:</strong> {client.status}</p>
+      <p><strong>Created:</strong> {client.createdAt}</p>
+      <p><strong>Updated:</strong> {client.updatedAt}</p>
+    </section>
+
+    <div class="actions">
+      <a class="button" href="/admin/ui/api-clients/{client.id}/claim-invitations/new">Create Claim Invitation</a>
+    </div>
+
+    <h2>API Keys</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Prefix</th>
+          <th>Environment</th>
+          <th>Status</th>
+          <th>Scopes</th>
+          <th>Expires</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#for key in keys}
+        <tr>
+          <td><a href="/admin/ui/api-keys/{key.id}">{key.id}</a></td>
+          <td>{key.keyName}</td>
+          <td>{key.keyPrefix}</td>
+          <td>{key.environment}</td>
+          <td>{key.status}</td>
+          <td>
+            <div class="scopes">
+              {#for scope in key.scopes}
+              <span class="scope">{scope}</span>
+              {/for}
+            </div>
+          </td>
+          <td>{key.expiresAt}</td>
+        </tr>
+        {#else}
+        <tr>
+          <td colspan="7">No API keys have been claimed for this client.</td>
+        </tr>
+        {/for}
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

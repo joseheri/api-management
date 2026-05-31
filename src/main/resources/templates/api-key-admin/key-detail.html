@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>API Key {key.id}</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <header>
+    <h1>{key.keyName}</h1>
+    <div class="nav">
+      <a href="/admin/ui/api-clients">Clients</a>
+      <a href="/admin/ui/api-clients/{key.clientId}">Client Details</a>
+      <a href="/key-claim/ui">Claim API Key</a>
+    </div>
+  </header>
+  <main>
+    <p class="warning">Admin UI access currently relies on the dev/test <code>X-Dev-Admin-User</code> header and is not production authentication.</p>
+    {#if notice}
+    <p class="notice">{notice}</p>
+    {/if}
+    <section class="panel">
+      <p><strong>ID:</strong> {key.id}</p>
+      <p><strong>Client ID:</strong> <a href="/admin/ui/api-clients/{key.clientId}">{key.clientId}</a></p>
+      <p><strong>Prefix:</strong> {key.keyPrefix}</p>
+      <p><strong>Environment:</strong> {key.environment}</p>
+      <p><strong>Status:</strong> {key.status}</p>
+      <p><strong>Created:</strong> {key.createdAt}</p>
+      <p><strong>Expires:</strong> {key.expiresAt}</p>
+      <p><strong>Revoked:</strong> {key.revokedAt}</p>
+      <div class="scopes">
+        {#for scope in key.scopes}
+        <span class="scope">{scope}</span>
+        {/for}
+      </div>
+    </section>
+    <div class="actions">
+      <a class="button danger" href="/admin/ui/api-keys/{key.id}/revoke">Revoke Key</a>
+      <a class="button secondary" href="/admin/ui/api-clients/{key.clientId}">Back to Client</a>
+    </div>
+  </main>
+</body>
+</html>

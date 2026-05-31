@@ -1,0 +1,164 @@
+body {
+  color: #1d252c;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.45;
+  margin: 0;
+  background: #f6f8fa;
+}
+
+header {
+  background: #17324d;
+  color: #fff;
+  padding: 20px 32px;
+}
+
+header a {
+  color: #d9ebff;
+}
+
+main {
+  margin: 0 auto;
+  max-width: 1080px;
+  padding: 28px 32px 48px;
+}
+
+a {
+  color: #005ea8;
+}
+
+.nav {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.panel,
+.notice,
+.warning,
+.error {
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  margin: 16px 0;
+  padding: 18px;
+}
+
+.notice {
+  border-color: #2e7d32;
+  color: #1b5e20;
+}
+
+.warning {
+  border-color: #b26a00;
+  color: #6f4600;
+}
+
+.error {
+  border-color: #b42318;
+  color: #8a1f14;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.button,
+button {
+  background: #005ea8;
+  border: 1px solid #005ea8;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font: inherit;
+  padding: 9px 14px;
+  text-decoration: none;
+}
+
+.button.secondary {
+  background: #fff;
+  color: #005ea8;
+}
+
+.button.danger,
+button.danger {
+  background: #b42318;
+  border-color: #b42318;
+}
+
+table {
+  background: #fff;
+  border-collapse: collapse;
+  margin-top: 16px;
+  width: 100%;
+}
+
+th,
+td {
+  border: 1px solid #d0d7de;
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #edf2f7;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  margin-top: 14px;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid #8c959f;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font: inherit;
+  margin-top: 5px;
+  max-width: 620px;
+  padding: 8px;
+  width: 100%;
+}
+
+.checkbox-list label {
+  font-weight: 400;
+  margin-top: 8px;
+}
+
+.checkbox-list input {
+  margin-right: 8px;
+  width: auto;
+}
+
+.secret {
+  background: #fff8c5;
+  border: 1px solid #d4a72c;
+  border-radius: 6px;
+  font-family: Consolas, Monaco, monospace;
+  overflow-wrap: anywhere;
+  padding: 14px;
+}
+
+.muted {
+  color: #57606a;
+}
+
+.scopes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.scope {
+  background: #eef6ff;
+  border: 1px solid #b6d7f5;
+  border-radius: 999px;
+  padding: 2px 8px;
+}

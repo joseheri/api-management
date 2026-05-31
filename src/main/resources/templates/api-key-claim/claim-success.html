@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>API Key Claimed</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <header>
+    <h1>API Key Claimed</h1>
+  </header>
+  <main>
+    <p class="warning">Copy this API key now. It will not be shown again.</p>
+    <section class="panel">
+      <p><strong>Key ID:</strong> {claimedKey.keyId}</p>
+      <p><strong>Client ID:</strong> {claimedKey.clientId}</p>
+      <p><strong>Key Name:</strong> {claimedKey.keyName}</p>
+      <p><strong>Prefix:</strong> {claimedKey.keyPrefix}</p>
+      <p><strong>Environment:</strong> {claimedKey.environment}</p>
+      <p><strong>Expires:</strong> {claimedKey.expiresAt}</p>
+      <div class="scopes">
+        {#for scope in claimedKey.scopes}
+        <span class="scope">{scope}</span>
+        {/for}
+      </div>
+    </section>
+    <h2>One-Time API Key</h2>
+    <pre class="secret">{claimedKey.apiKey}</pre>
+  </main>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Claim Invitation Created</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <header>
+    <h1>Claim Invitation Created</h1>
+    <div class="nav">
+      <a href="/admin/ui/api-clients">Clients</a>
+      <a href="/admin/ui/api-clients/{invitation.clientId}">Client Details</a>
+      <a href="/key-claim/ui">Claim API Key</a>
+    </div>
+  </header>
+  <main>
+    <p class="warning">Show this claim code once to the approved recipient through an internal out-of-band process. The system does not send email and will not show this code again.</p>
+    <section class="panel">
+      <p><strong>Invitation ID:</strong> {invitation.invitationId}</p>
+      <p><strong>Approved Email / Claim Identifier:</strong> {invitation.approvedEmail}</p>
+      <p><strong>Key Name:</strong> {invitation.keyName}</p>
+      <p><strong>Environment:</strong> {invitation.environment}</p>
+      <p><strong>Expires:</strong> {invitation.expiresAt}</p>
+      <p><strong>Approval Reference:</strong> {invitation.approvalReference}</p>
+      <div class="scopes">
+        {#for scope in invitation.scopes}
+        <span class="scope">{scope}</span>
+        {/for}
+      </div>
+    </section>
+    <h2>One-Time Claim Code</h2>
+    <pre class="secret">{invitation.claimCode}</pre>
+    <div class="actions">
+      <a class="button" href="/admin/ui/api-clients/{invitation.clientId}">Back to Client</a>
+    </div>
+  </main>
+</body>
+</html>

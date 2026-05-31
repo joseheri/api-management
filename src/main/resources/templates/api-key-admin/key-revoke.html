@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Revoke API Key {key.id}</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <header>
+    <h1>Revoke API Key</h1>
+    <div class="nav">
+      <a href="/admin/ui/api-clients">Clients</a>
+      <a href="/admin/ui/api-keys/{key.id}">Key Details</a>
+    </div>
+  </header>
+  <main>
+    <p class="warning">Revoked keys cannot be used for future API requests.</p>
+    <form class="panel" method="post" action="/admin/ui/api-keys/{key.id}/revoke">
+      <p><strong>Key:</strong> {key.keyName}</p>
+      <p><strong>Prefix:</strong> {key.keyPrefix}</p>
+      <p><strong>Status:</strong> {key.status}</p>
+
+      <label for="reason">Revocation Reason</label>
+      <textarea id="reason" name="reason" rows="4"></textarea>
+
+      <div class="actions">
+        <button class="danger" type="submit">Revoke Key</button>
+        <a class="button secondary" href="/admin/ui/api-keys/{key.id}">Cancel</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

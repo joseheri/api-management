@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>API Clients</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <header>
+    <h1>API Clients</h1>
+    <div class="nav">
+      <a href="/admin/ui/api-clients">Clients</a>
+      <a href="/admin/ui/api-clients/new">New Client</a>
+      <a href="/key-claim/ui">Claim API Key</a>
+    </div>
+  </header>
+  <main>
+    <p class="warning">Admin UI access currently relies on the dev/test <code>X-Dev-Admin-User</code> header and is not production authentication.</p>
+    <div class="actions">
+      <a class="button" href="/admin/ui/api-clients/new">Create API Client</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Contact</th>
+          <th>Owner</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#for client in clients}
+        <tr>
+          <td><a href="/admin/ui/api-clients/{client.id}">{client.id}</a></td>
+          <td>{client.clientName}</td>
+          <td>{client.contactEmail}</td>
+          <td>{client.owner}</td>
+          <td>{client.status}</td>
+          <td>{client.createdAt}</td>
+        </tr>
+        {#else}
+        <tr>
+          <td colspan="6">No API clients found.</td>
+        </tr>
+        {/for}
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

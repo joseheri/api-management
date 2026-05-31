@@ -1,0 +1,2 @@
+-- Dev-mode SQL load placeholder.
+-- Intentionally empty: no sample data, schema changes, secrets, claim codes, or API keys.
