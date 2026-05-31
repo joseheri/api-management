@@ -23,7 +23,7 @@ public class ApiKey {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CLIENT_ID", nullable = false)
+    @JoinColumn(name = "CLIENT_ID", referencedColumnName = "ID", nullable = false)
     private ApiClient client;
 
     @Column(name = "KEY_PREFIX", nullable = false, unique = true, length = 64)

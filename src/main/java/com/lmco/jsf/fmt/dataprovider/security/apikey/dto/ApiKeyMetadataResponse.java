@@ -16,6 +16,7 @@ public class ApiKeyMetadataResponse {
     private List<String> scopes;
     private Instant createdAt;
     private Instant expiresAt;
+    private Instant revokedAt;
 
     public Long getId() {
         return id;
@@ -87,5 +88,13 @@ public class ApiKeyMetadataResponse {
 
     public void setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    public Instant getRevokedAt() {
+        return revokedAt;
+    }
+
+    public void setRevokedAt(Instant revokedAt) {
+        this.revokedAt = revokedAt;
     }
 }

@@ -6,10 +6,34 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @ApplicationScoped
 public class ApiKeySecurityConfig {
 
+    public static final String DEFAULT_API_KEY_HEADER = "X-API-Key";
+    public static final String DEFAULT_DEV_ADMIN_HEADER = "X-Dev-Admin-User";
+
     @ConfigProperty(name = "apikey.secret")
-    String hmacSecret;
+    private String hmacSecret;
+
+    @ConfigProperty(name = "apikey.header-name", defaultValue = DEFAULT_API_KEY_HEADER)
+    private String apiKeyHeaderName;
+
+    @ConfigProperty(name = "apikey.dev-admin.enabled", defaultValue = "false")
+    private boolean devAdminEnabled;
+
+    @ConfigProperty(name = "apikey.dev-admin.header-name", defaultValue = DEFAULT_DEV_ADMIN_HEADER)
+    private String devAdminHeaderName;
 
     public String getHmacSecret() {
         return hmacSecret;
+    }
+
+    public String getApiKeyHeaderName() {
+        return apiKeyHeaderName;
+    }
+
+    public boolean isDevAdminEnabled() {
+        return devAdminEnabled;
+    }
+
+    public String getDevAdminHeaderName() {
+        return devAdminHeaderName;
     }
 }

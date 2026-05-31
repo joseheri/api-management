@@ -23,7 +23,7 @@ public class ApiKeyClaimInvitation {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CLIENT_ID", nullable = false)
+    @JoinColumn(name = "CLIENT_ID", referencedColumnName = "ID", nullable = false)
     private ApiClient client;
 
     @Column(name = "APPROVED_EMAIL", nullable = false, length = 255)

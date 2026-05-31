@@ -20,7 +20,7 @@ public class ApiKeyScope {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "KEY_ID", nullable = false)
+    @JoinColumn(name = "KEY_ID", referencedColumnName = "ID", nullable = false)
     private ApiKey apiKey;
 
     @Column(name = "SCOPE", nullable = false, length = 128)

@@ -8,8 +8,10 @@ public class ApiClientResponse {
     private Long id;
     private String clientName;
     private String contactEmail;
+    private String owner;
     private ApiClientStatus status;
     private Instant createdAt;
+    private Instant updatedAt;
 
     public Long getId() {
         return id;
@@ -35,6 +37,14 @@ public class ApiClientResponse {
         this.contactEmail = contactEmail;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
     public ApiClientStatus getStatus() {
         return status;
     }
@@ -49,5 +59,13 @@ public class ApiClientResponse {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
