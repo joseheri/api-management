@@ -5,7 +5,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.HttpHeaders;
 import io.quarkus.runtime.LaunchMode;
-import io.quarkus.runtime.configuration.ProfileManager;
 import java.util.Optional;
 
 @ApplicationScoped
@@ -42,11 +41,6 @@ public class DevAdminGuard {
 
     private boolean isDevOrTestRuntime() {
         LaunchMode launchMode = LaunchMode.current();
-        if (launchMode == LaunchMode.DEVELOPMENT || launchMode == LaunchMode.TEST) {
-            return true;
-        }
-
-        String activeProfile = ProfileManager.getActiveProfile();
-        return "dev".equals(activeProfile) || "test".equals(activeProfile);
+        return launchMode == LaunchMode.DEVELOPMENT || launchMode == LaunchMode.TEST;
     }
 }
