@@ -119,7 +119,7 @@ public class ApiKeyClaimService {
         return toInvitationResponse(invitation, invitation.getScopes(), rawClaimCode);
     }
 
-    @Transactional
+    @Transactional(dontRollbackOn = WebApplicationException.class)
     public ClaimKeyResponse claimKey(ClaimKeyRequest request) {
         if (request == null) {
             throw new BadRequestException("Request body is required");

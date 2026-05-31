@@ -164,7 +164,7 @@ public class ApiKeyAuthenticationFilter implements ContainerRequestFilter {
     }
 
     private String normalizedPath(ContainerRequestContext requestContext) {
-        String path = requestContext.getUriInfo().getPath(false);
+        String path = requestContext.getUriInfo().getPath();
         if (path == null || path.isBlank()) {
             return "/";
         }
