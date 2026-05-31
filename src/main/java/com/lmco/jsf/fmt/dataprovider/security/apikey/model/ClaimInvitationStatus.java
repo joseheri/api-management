@@ -4,5 +4,6 @@ public enum ClaimInvitationStatus {
     PENDING,
     CLAIMED,
     EXPIRED,
-    REVOKED
+    REVOKED,
+    LOCKED
 }

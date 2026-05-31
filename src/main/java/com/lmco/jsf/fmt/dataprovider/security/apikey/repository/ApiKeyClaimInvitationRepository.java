@@ -33,6 +33,18 @@ public class ApiKeyClaimInvitationRepository {
                 .findFirst();
     }
 
+    public Optional<ApiKeyClaimInvitation> findLatestByApprovedEmail(String approvedEmail) {
+        return entityManager.createQuery(
+                        "select i from ApiKeyClaimInvitation i "
+                                + "where lower(i.approvedEmail) = lower(:approvedEmail) "
+                                + "order by i.createdAt desc, i.id desc",
+                        ApiKeyClaimInvitation.class)
+                .setParameter("approvedEmail", approvedEmail)
+                .setMaxResults(1)
+                .getResultStream()
+                .findFirst();
+    }
+
     public List<ApiKeyClaimInvitation> listByClientId(Long clientId, int offset, int limit) {
         return entityManager.createQuery(
                         "select i from ApiKeyClaimInvitation i "

@@ -51,6 +51,33 @@ public class ApiKeyRepository {
                 .getResultList();
     }
 
+    public List<ApiKey> listExpiredActiveKeys(int offset, int limit) {
+        return entityManager.createQuery(
+                        "select k from ApiKey k "
+                                + "where k.status = :status and k.expiresAt is not null and k.expiresAt <= CURRENT_TIMESTAMP "
+                                + "order by k.expiresAt asc, k.id asc",
+                        ApiKey.class)
+                .setParameter("status", ApiKeyStatus.ACTIVE)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    public List<ApiKey> listRotationGraceEndedActiveKeys(int offset, int limit) {
+        return entityManager.createQuery(
+                        "select k from ApiKey k "
+                                + "where k.status = :status "
+                                + "and k.rotationInitiatedAt is not null "
+                                + "and k.gracePeriodEndsAt is not null "
+                                + "and k.gracePeriodEndsAt <= CURRENT_TIMESTAMP "
+                                + "order by k.gracePeriodEndsAt asc, k.id asc",
+                        ApiKey.class)
+                .setParameter("status", ApiKeyStatus.ACTIVE)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
     public long countByClientId(Long clientId) {
         return entityManager.createQuery(
                         "select count(k) from ApiKey k where k.client.id = :clientId",

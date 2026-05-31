@@ -52,6 +52,27 @@ public class ApiKey {
     @Column(name = "REVOKED_AT")
     private Instant revokedAt;
 
+    @Column(name = "REVOKED_BY", length = 255)
+    private String revokedBy;
+
+    @Column(name = "REVOCATION_REASON", length = 1000)
+    private String revocationReason;
+
+    @Column(name = "LAST_USED_AT")
+    private Instant lastUsedAt;
+
+    @Column(name = "ROTATION_GROUP_ID", length = 64)
+    private String rotationGroupId;
+
+    @Column(name = "ROTATION_INITIATED_AT")
+    private Instant rotationInitiatedAt;
+
+    @Column(name = "GRACE_PERIOD_ENDS_AT")
+    private Instant gracePeriodEndsAt;
+
+    @Column(name = "ROTATED_AT")
+    private Instant rotatedAt;
+
     public Long getId() {
         return id;
     }
@@ -130,5 +151,61 @@ public class ApiKey {
 
     public void setRevokedAt(Instant revokedAt) {
         this.revokedAt = revokedAt;
+    }
+
+    public String getRevokedBy() {
+        return revokedBy;
+    }
+
+    public void setRevokedBy(String revokedBy) {
+        this.revokedBy = revokedBy;
+    }
+
+    public String getRevocationReason() {
+        return revocationReason;
+    }
+
+    public void setRevocationReason(String revocationReason) {
+        this.revocationReason = revocationReason;
+    }
+
+    public Instant getLastUsedAt() {
+        return lastUsedAt;
+    }
+
+    public void setLastUsedAt(Instant lastUsedAt) {
+        this.lastUsedAt = lastUsedAt;
+    }
+
+    public String getRotationGroupId() {
+        return rotationGroupId;
+    }
+
+    public void setRotationGroupId(String rotationGroupId) {
+        this.rotationGroupId = rotationGroupId;
+    }
+
+    public Instant getRotationInitiatedAt() {
+        return rotationInitiatedAt;
+    }
+
+    public void setRotationInitiatedAt(Instant rotationInitiatedAt) {
+        this.rotationInitiatedAt = rotationInitiatedAt;
+    }
+
+    public Instant getGracePeriodEndsAt() {
+        return gracePeriodEndsAt;
+    }
+
+    public void setGracePeriodEndsAt(Instant gracePeriodEndsAt) {
+        this.gracePeriodEndsAt = gracePeriodEndsAt;
+    }
+
+    public Instant getRotatedAt() {
+        return rotatedAt;
+    }
+
+    public void setRotatedAt(Instant rotatedAt) {
+        this.rotatedAt = rotatedAt;
     }
 }

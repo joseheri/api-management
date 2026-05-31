@@ -1,6 +1,8 @@
 package com.lmco.jsf.fmt.dataprovider.security.apikey.model;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,6 +14,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "api_key_claim_invitations")
@@ -54,6 +58,22 @@ public class ApiKeyClaimInvitation {
 
     @Column(name = "CLAIMED_AT")
     private Instant claimedAt;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "api_key_claim_invitation_scopes",
+            joinColumns = @JoinColumn(name = "INVITATION_ID", referencedColumnName = "ID", nullable = false))
+    @Column(name = "SCOPE", nullable = false, length = 128)
+    private List<String> scopes = new ArrayList<>();
+
+    @Column(name = "FAILED_ATTEMPT_COUNT", nullable = false)
+    private int failedAttemptCount;
+
+    @Column(name = "MAX_ATTEMPTS", nullable = false)
+    private int maxAttempts;
+
+    @Column(name = "LOCKED_AT")
+    private Instant lockedAt;
 
     public Long getId() {
         return id;
@@ -141,5 +161,37 @@ public class ApiKeyClaimInvitation {
 
     public void setClaimedAt(Instant claimedAt) {
         this.claimedAt = claimedAt;
+    }
+
+    public List<String> getScopes() {
+        return scopes;
+    }
+
+    public void setScopes(List<String> scopes) {
+        this.scopes = scopes == null ? new ArrayList<>() : new ArrayList<>(scopes);
+    }
+
+    public int getFailedAttemptCount() {
+        return failedAttemptCount;
+    }
+
+    public void setFailedAttemptCount(int failedAttemptCount) {
+        this.failedAttemptCount = failedAttemptCount;
+    }
+
+    public int getMaxAttempts() {
+        return maxAttempts;
+    }
+
+    public void setMaxAttempts(int maxAttempts) {
+        this.maxAttempts = maxAttempts;
+    }
+
+    public Instant getLockedAt() {
+        return lockedAt;
+    }
+
+    public void setLockedAt(Instant lockedAt) {
+        this.lockedAt = lockedAt;
     }
 }
