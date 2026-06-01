@@ -6,6 +6,7 @@ import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ApiClientResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimInvitationCreatedResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimKeyRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimKeyResponse;
+import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimReviewResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.CreateApiClientRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.CreateClaimInvitationRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.RevokeApiKeyRequest;
@@ -121,6 +122,10 @@ public class ApiKeyAdminUiResource {
     @Inject
     @Location("api-key-claim/claim-success.html")
     private Template claimSuccessTemplate;
+
+    @Inject
+    @Location("api-key-claim/claim-review.html")
+    private Template claimReviewTemplate;
 
     @Inject
     @Location("api-key-claim/claim-error.html")
@@ -370,6 +375,26 @@ public class ApiKeyAdminUiResource {
     }
 
     @POST
+    @Path("/key-claim/ui/review")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response reviewClaim(
+            @FormParam("approvedEmail") String approvedEmail,
+            @FormParam("claimCode") String claimCode) {
+        try {
+            ClaimKeyRequest request = new ClaimKeyRequest();
+            request.setApprovedEmail(approvedEmail);
+            request.setClaimCode(claimCode);
+            ClaimReviewResponse claimReview = apiKeyClaimService.reviewClaim(request);
+            return html(Response.Status.OK, claimReviewTemplate
+                    .data("claimReview", claimReview)
+                    .data("approvedEmail", approvedEmail)
+                    .data("claimCode", claimCode));
+        } catch (WebApplicationException exception) {
+            return claimError(exception);
+        }
+    }
+
+    @POST
     @Path("/key-claim/ui/complete")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response completeClaim(
@@ -383,9 +408,7 @@ public class ApiKeyAdminUiResource {
             return html(Response.Status.OK, claimSuccessTemplate
                     .data("claimedKey", claimedKey));
         } catch (WebApplicationException exception) {
-            Response.Status status = Response.Status.fromStatusCode(exception.getResponse().getStatus());
-            return html(status == null ? Response.Status.BAD_REQUEST : status, claimErrorTemplate
-                    .data("message", exception.getMessage()));
+            return claimError(exception);
         }
     }
 
@@ -428,6 +451,32 @@ public class ApiKeyAdminUiResource {
     private Response adminError(Response.Status status, String message) {
         return html(status, adminErrorTemplate
                 .data("message", message));
+    }
+
+    private Response claimError(WebApplicationException exception) {
+        Response.Status status = Response.Status.fromStatusCode(exception.getResponse().getStatus());
+        Response.Status safeStatus = status == null ? Response.Status.BAD_REQUEST : status;
+        return html(safeStatus, claimErrorTemplate
+                .data("message", claimErrorMessage(safeStatus, exception)));
+    }
+
+    private String claimErrorMessage(Response.Status status, WebApplicationException exception) {
+        if (status == Response.Status.UNAUTHORIZED || status == Response.Status.NOT_FOUND) {
+            return "Invalid claim information. Check the approved identifier and one-time claim code, then try again.";
+        }
+        if (status == Response.Status.GONE) {
+            return "Claim invitation expired. Contact your internal administrator for a new claim invitation.";
+        }
+        if (status == Response.Status.CONFLICT) {
+            return "Claim invitation already used. Contact your internal administrator if you need a replacement.";
+        }
+        if (status == Response.Status.FORBIDDEN) {
+            String message = exception.getMessage() == null ? "" : exception.getMessage().toLowerCase();
+            if (message.contains("locked")) {
+                return "Claim invitation locked. Contact your internal administrator for assistance.";
+            }
+        }
+        return "Unable to complete claim. Contact your internal administrator if the problem continues.";
     }
 
     private Response html(Response.Status status, Template template) {

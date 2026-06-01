@@ -2,30 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>API Key Claimed</title>
+  <title>API Key Generated</title>
   <link rel="stylesheet" href="/assets/api-key-ui.css">
 </head>
 <body>
-  <header>
-    <h1>API Key Claimed</h1>
-  </header>
-  <main>
-    <p class="warning">Copy this API key now. It will not be shown again.</p>
-    <section class="panel">
-      <p><strong>Key ID:</strong> {claimedKey.keyId}</p>
-      <p><strong>Client ID:</strong> {claimedKey.clientId}</p>
-      <p><strong>Key Name:</strong> {claimedKey.keyName}</p>
-      <p><strong>Prefix:</strong> {claimedKey.keyPrefix}</p>
-      <p><strong>Environment:</strong> {claimedKey.environment}</p>
-      <p><strong>Expires:</strong> {claimedKey.expiresAt}</p>
-      <div class="scopes">
-        {#for scope in claimedKey.scopes}
-        <span class="scope">{scope}</span>
-        {/for}
+  <main class="claim-page">
+    <section class="claim-card">
+      <div class="kicker">Step 3 of 3</div>
+      <h1>API Key Generated</h1>
+      <p class="subtle">Copy this API key now. It cannot be retrieved after you leave this page.</p>
+      <div class="stepper"><div class="step done"></div><div class="step done"></div><div class="step done"></div></div>
+
+      <div class="notice success">Your key has been created and linked to the approved client application.</div>
+
+      <label for="apiKeyValue">API Key</label>
+      <div id="apiKeyValue" class="secret-box">{claimedKey.apiKey}</div>
+
+      <div class="summary-list">
+        <div class="key">Key Prefix</div><div>{claimedKey.keyPrefix}</div>
+        <div class="key">Environment</div><div>{claimedKey.environment}</div>
+        <div class="key">Key Name</div><div>{claimedKey.keyName}</div>
+        <div class="key">Expires</div><div>{claimedKey.expiresAt}</div>
+        <div class="key">Scopes</div>
+        <div class="scopes">{#for scope in claimedKey.scopes}<span class="scope">{scope}</span>{/for}</div>
+      </div>
+
+      <div class="notice danger">This system stores only a hash of the key. If this key is lost, an admin must revoke it and issue a new claim invitation.</div>
+
+      <ul class="instruction-list">
+        <li>Copy this key now.</li>
+        <li>Store it in a secure secret manager or approved application configuration.</li>
+        <li>It will not be shown again.</li>
+        <li>Send it using the <strong>X-API-Key</strong> header when calling approved endpoints.</li>
+      </ul>
+
+      <div class="usage">X-API-Key: &lt;api-key&gt;</div>
+
+      <div class="actions">
+        <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('apiKeyValue').innerText)">Copy API Key</button>
+        <a class="button secondary" href="/key-claim/ui">Done</a>
       </div>
     </section>
-    <h2>One-Time API Key</h2>
-    <pre class="secret">{claimedKey.apiKey}</pre>
   </main>
 </body>
 </html>

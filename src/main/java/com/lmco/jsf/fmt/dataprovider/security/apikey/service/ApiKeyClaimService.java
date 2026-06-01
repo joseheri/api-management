@@ -3,6 +3,7 @@ package com.lmco.jsf.fmt.dataprovider.security.apikey.service;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimInvitationCreatedResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimKeyRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimKeyResponse;
+import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimReviewResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.CreateClaimInvitationRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.model.ApiClient;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.model.ApiClientStatus;
@@ -120,7 +121,44 @@ public class ApiKeyClaimService {
     }
 
     @Transactional(dontRollbackOn = WebApplicationException.class)
+    public ClaimReviewResponse reviewClaim(ClaimKeyRequest request) {
+        ApiKeyClaimInvitation invitation = validateClaimRequest(request);
+        return toClaimReviewResponse(invitation, List.copyOf(invitation.getScopes()));
+    }
+
+    @Transactional(dontRollbackOn = WebApplicationException.class)
     public ClaimKeyResponse claimKey(ClaimKeyRequest request) {
+        ApiKeyClaimInvitation invitation = validateClaimRequest(request);
+        ApiClient client = invitation.getClient();
+        if (client.getStatus() != ApiClientStatus.ACTIVE) {
+            throw new ForbiddenException("API client is disabled");
+        }
+
+        ApiKeyGenerator.GeneratedApiKey generatedKey = generateUniqueApiKey(invitation);
+        ApiKey apiKey = new ApiKey();
+        apiKey.setClient(client);
+        apiKey.setKeyPrefix(generatedKey.keyPrefix());
+        apiKey.setKeyHash(keyHasher.hmacSha256(generatedKey.apiKey()));
+        apiKey.setKeyName(invitation.getKeyName());
+        apiKey.setEnvironment(invitation.getEnvironment());
+        apiKey.setStatus(ApiKeyStatus.ACTIVE);
+        apiKey.setCreatedAt(Instant.now());
+        apiKey.setExpiresAt(invitation.getExpiresAt());
+        keyRepository.persist(apiKey);
+
+        List<String> scopes = List.copyOf(invitation.getScopes());
+        persistScopes(apiKey, scopes);
+
+        invitation.setStatus(ClaimInvitationStatus.CLAIMED);
+        invitation.setClaimedAt(Instant.now());
+        invitationRepository.update(invitation);
+
+        auditService.recordEvent(client.getId(), apiKey.getId(), ApiKeyAuditEventType.KEY_CLAIMED, CLAIM_ACTOR,
+                "invitationId=" + invitation.getId() + "; keyPrefix=" + apiKey.getKeyPrefix());
+        return toClaimKeyResponse(apiKey, scopes, generatedKey.apiKey());
+    }
+
+    private ApiKeyClaimInvitation validateClaimRequest(ClaimKeyRequest request) {
         if (request == null) {
             throw new BadRequestException("Request body is required");
         }
@@ -158,34 +196,7 @@ public class ApiKeyClaimService {
                             + "; failedAttemptCount=" + invitation.getFailedAttemptCount());
             throw new NotAuthorizedException("Invalid claim code");
         }
-
-        ApiClient client = invitation.getClient();
-        if (client.getStatus() != ApiClientStatus.ACTIVE) {
-            throw new ForbiddenException("API client is disabled");
-        }
-
-        ApiKeyGenerator.GeneratedApiKey generatedKey = generateUniqueApiKey(invitation);
-        ApiKey apiKey = new ApiKey();
-        apiKey.setClient(client);
-        apiKey.setKeyPrefix(generatedKey.keyPrefix());
-        apiKey.setKeyHash(keyHasher.hmacSha256(generatedKey.apiKey()));
-        apiKey.setKeyName(invitation.getKeyName());
-        apiKey.setEnvironment(invitation.getEnvironment());
-        apiKey.setStatus(ApiKeyStatus.ACTIVE);
-        apiKey.setCreatedAt(Instant.now());
-        apiKey.setExpiresAt(invitation.getExpiresAt());
-        keyRepository.persist(apiKey);
-
-        List<String> scopes = List.copyOf(invitation.getScopes());
-        persistScopes(apiKey, scopes);
-
-        invitation.setStatus(ClaimInvitationStatus.CLAIMED);
-        invitation.setClaimedAt(Instant.now());
-        invitationRepository.update(invitation);
-
-        auditService.recordEvent(client.getId(), apiKey.getId(), ApiKeyAuditEventType.KEY_CLAIMED, CLAIM_ACTOR,
-                "invitationId=" + invitation.getId() + "; keyPrefix=" + apiKey.getKeyPrefix());
-        return toClaimKeyResponse(apiKey, scopes, generatedKey.apiKey());
+        return invitation;
     }
 
     private ApiClient findClient(Long clientId) {
@@ -257,6 +268,20 @@ public class ApiKeyClaimService {
         response.setEnvironment(apiKey.getEnvironment());
         response.setScopes(scopes);
         response.setExpiresAt(apiKey.getExpiresAt());
+        return response;
+    }
+
+    private ClaimReviewResponse toClaimReviewResponse(ApiKeyClaimInvitation invitation, List<String> scopes) {
+        ClaimReviewResponse response = new ClaimReviewResponse();
+        response.setInvitationId(invitation.getId());
+        response.setClientId(invitation.getClient().getId());
+        response.setClientName(invitation.getClient().getClientName());
+        response.setApprovedEmail(invitation.getApprovedEmail());
+        response.setKeyName(invitation.getKeyName());
+        response.setEnvironment(invitation.getEnvironment());
+        response.setScopes(scopes);
+        response.setApprovalReference(invitation.getApprovalReference());
+        response.setExpiresAt(invitation.getExpiresAt());
         return response;
     }
 

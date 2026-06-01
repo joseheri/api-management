@@ -6,14 +6,19 @@
   <link rel="stylesheet" href="/assets/api-key-ui.css">
 </head>
 <body>
-  <header>
-    <h1>Claim Failed</h1>
-  </header>
-  <main>
-    <p class="error">{message}</p>
-    <div class="actions">
-      <a class="button" href="/key-claim/ui">Try Again</a>
-    </div>
+  <main class="claim-page">
+    <section class="claim-card">
+      <div class="kicker">Claim workflow</div>
+      <h1>Unable to Complete Claim</h1>
+      <p class="subtle">The claim could not be completed. Review the message below and try again or contact your internal administrator.</p>
+      <div class="stepper"><div class="step done"></div><div class="step"></div><div class="step"></div></div>
+
+      <div class="notice error">{message}</div>
+
+      <div class="actions">
+        <a class="button" href="/key-claim/ui">Try Again</a>
+      </div>
+    </section>
   </main>
 </body>
 </html>

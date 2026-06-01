@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Review Approved Access</title>
+  <link rel="stylesheet" href="/assets/api-key-ui.css">
+</head>
+<body>
+  <main class="claim-page">
+    <section class="claim-card">
+      <div class="kicker">Step 2 of 3</div>
+      <h1>Review Approved Access</h1>
+      <p class="subtle">Completing this step will generate the API key. The API key will be shown once.</p>
+      <div class="stepper"><div class="step done"></div><div class="step done"></div><div class="step"></div></div>
+
+      <section class="summary-card">
+        <h2>Pre-Approved Key Details</h2>
+        <div class="summary-list">
+          <div class="key">Client/Application</div><div>{claimReview.clientName}</div>
+          <div class="key">Environment</div><div>{claimReview.environment}</div>
+          <div class="key">Key Name</div><div>{claimReview.keyName}</div>
+          <div class="key">Approved Email / Claim Identifier</div><div>{claimReview.approvedEmail}</div>
+          <div class="key">API Key Expires</div><div>{claimReview.expiresAt}</div>
+          <div class="key">Approved Scopes</div>
+          <div class="scopes">{#for scope in claimReview.scopes}<span class="scope">{scope}</span>{/for}</div>
+        </div>
+      </section>
+
+      <div class="notice warning">After you click Generate API Key, copy it immediately. It cannot be retrieved again.</div>
+
+      <form method="post" action="/key-claim/ui/complete">
+        <input type="hidden" name="approvedEmail" value="{approvedEmail}">
+        <input type="hidden" name="claimCode" value="{claimCode}">
+        <div class="actions">
+          <button type="submit">Generate API Key</button>
+          <a class="button secondary" href="/key-claim/ui">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
