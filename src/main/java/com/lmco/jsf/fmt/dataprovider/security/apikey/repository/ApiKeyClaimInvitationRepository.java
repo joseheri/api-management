@@ -74,6 +74,18 @@ public class ApiKeyClaimInvitationRepository {
                 .getResultList();
     }
 
+    public List<ApiKeyClaimInvitation> listByStatus(ClaimInvitationStatus status, int offset, int limit) {
+        return entityManager.createQuery(
+                        "select i from ApiKeyClaimInvitation i join fetch i.client "
+                                + "where i.status = :status "
+                                + "order by i.createdAt desc, i.id desc",
+                        ApiKeyClaimInvitation.class)
+                .setParameter("status", status)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
     public long countByClientId(Long clientId) {
         return entityManager.createQuery(
                         "select count(i) from ApiKeyClaimInvitation i where i.client.id = :clientId",
@@ -88,6 +100,14 @@ public class ApiKeyClaimInvitationRepository {
                                 + "where i.client.id = :clientId and i.status = :status",
                         Long.class)
                 .setParameter("clientId", clientId)
+                .setParameter("status", status)
+                .getSingleResult();
+    }
+
+    public long countByStatus(ClaimInvitationStatus status) {
+        return entityManager.createQuery(
+                        "select count(i) from ApiKeyClaimInvitation i where i.status = :status",
+                        Long.class)
                 .setParameter("status", status)
                 .getSingleResult();
     }

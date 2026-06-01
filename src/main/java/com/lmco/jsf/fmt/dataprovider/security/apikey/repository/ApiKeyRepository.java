@@ -51,6 +51,15 @@ public class ApiKeyRepository {
                 .getResultList();
     }
 
+    public List<ApiKey> list(int offset, int limit) {
+        return entityManager.createQuery(
+                        "select k from ApiKey k join fetch k.client order by k.createdAt desc, k.id desc",
+                        ApiKey.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
     public List<ApiKey> listExpiredActiveKeys(int offset, int limit) {
         return entityManager.createQuery(
                         "select k from ApiKey k "
@@ -92,6 +101,33 @@ public class ApiKeyRepository {
                         Long.class)
                 .setParameter("clientId", clientId)
                 .setParameter("status", status)
+                .getSingleResult();
+    }
+
+    public long count() {
+        return entityManager.createQuery(
+                        "select count(k) from ApiKey k",
+                        Long.class)
+                .getSingleResult();
+    }
+
+    public long countByStatus(ApiKeyStatus status) {
+        return entityManager.createQuery(
+                        "select count(k) from ApiKey k where k.status = :status",
+                        Long.class)
+                .setParameter("status", status)
+                .getSingleResult();
+    }
+
+    public long countActiveExpiringBefore(java.time.Instant expiresBefore) {
+        return entityManager.createQuery(
+                        "select count(k) from ApiKey k "
+                                + "where k.status = :status "
+                                + "and k.expiresAt is not null "
+                                + "and k.expiresAt <= :expiresBefore",
+                        Long.class)
+                .setParameter("status", ApiKeyStatus.ACTIVE)
+                .setParameter("expiresBefore", expiresBefore)
                 .getSingleResult();
     }
 

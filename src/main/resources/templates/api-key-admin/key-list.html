@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>API Key Inventory</title>
+  <link rel="stylesheet" href="/assets/api-key-admin-ui.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AK</div><div><h1>API Key Management</h1><p>Admin console</p></div></div>
+      <nav class="nav">
+        <div class="nav-section-title">Admin</div>
+        <a href="/admin/ui">Dashboard</a>
+        <a href="/admin/ui/api-clients">API Clients</a>
+        <a class="active" href="/admin/ui/api-keys?status=ACTIVE">Active Keys</a>
+        <a href="/admin/ui/claim-invitations">Pending Claim Invitations</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE&expiresWithinDays=30">Expiring Keys</a>
+      </nav>
+      <div class="sidebar-note"><strong>Safe metadata</strong><br>This inventory shows prefixes, status, scopes, and lifecycle metadata only.</div>
+    </aside>
+    <main>
+      <div class="topbar">
+        <div><div class="eyebrow">Key Inventory</div><h2>API keys across clients</h2><p class="subtitle">Search and filter issued key metadata without exposing raw keys or stored hashes.</p></div>
+      </div>
+      <section class="card">
+        <div class="card-header"><div><h3>Filters</h3><p>Use status, environment, scope, and expiration windows to narrow the inventory.</p></div></div>
+        <div class="card-body">
+          <form class="filter-bar" method="get" action="/admin/ui/api-keys">
+            <div class="field"><label for="search">Search</label><input id="search" name="search" value="{search}"></div>
+            <div class="field"><label for="status">Status</label><select id="status" name="status"><option value="">Any</option>{#for keyStatus in keyStatuses}<option value="{keyStatus}">{keyStatus}</option>{/for}</select></div>
+            <div class="field"><label for="environment">Environment</label><select id="environment" name="environment"><option value="">Any</option>{#for env in environments}<option value="{env}">{env}</option>{/for}</select></div>
+            <div class="field"><label for="scope">Scope</label><select id="scope" name="scope"><option value="">Any</option>{#for availableScope in scopes}<option value="{availableScope}">{availableScope}</option>{/for}</select></div>
+            <div class="field"><label for="expiresWithinDays">Expires within days</label><input id="expiresWithinDays" name="expiresWithinDays" value="{expiresWithinDays}"></div>
+            <div class="field"><label>&nbsp;</label><button type="submit">Apply filters</button></div>
+          </form>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Client</th><th>Organization / Team</th><th>Key</th><th>Environment</th><th>Scopes</th><th>Prefix</th><th>Status</th><th>Expires</th><th>Last used</th><th>Actions</th></tr></thead>
+            <tbody>
+              {#for key in keys}
+              <tr>
+                <td><a class="client-name" href="/admin/ui/api-clients/{key.clientId}">{key.clientName}</a></td>
+                <td>{key.clientOwner}</td>
+                <td>{key.keyName}</td>
+                <td><span class="badge env-{key.environment}">{key.environment}</span></td>
+                <td>{#for scopeName in key.scopes}<span class="badge scope-badge">{scopeName}</span> {/for}</td>
+                <td><span class="mono">{key.keyPrefix}</span></td>
+                <td><span class="badge status-{key.status}">{key.status}</span></td>
+                <td>{key.expiresAt}</td>
+                <td>{key.lastUsedAt}</td>
+                <td><div class="inline-actions"><a class="btn btn-secondary" href="/admin/ui/api-keys/{key.id}">View</a><a class="btn btn-danger" href="/admin/ui/api-keys/{key.id}/revoke">Revoke</a></div></td>
+              </tr>
+              {#else}
+              <tr><td colspan="10">No keys match the current filters.</td></tr>
+              {/for}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

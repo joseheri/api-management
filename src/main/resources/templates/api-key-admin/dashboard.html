@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>API Key Admin Dashboard</title>
+  <link rel="stylesheet" href="/assets/api-key-admin-ui.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AK</div><div><h1>API Key Management</h1><p>Admin console</p></div></div>
+      <nav class="nav">
+        <div class="nav-section-title">Admin</div>
+        <a class="active" href="/admin/ui">Dashboard</a>
+        <a href="/admin/ui/api-clients">API Clients</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE">Active Keys</a>
+        <a href="/admin/ui/claim-invitations">Pending Claim Invitations</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE&expiresWithinDays=30">Expiring Keys</a>
+      </nav>
+      <div class="sidebar-note"><strong>Prototype boundary</strong><br>This admin workflow does not include the client claim screens.</div>
+    </aside>
+    <main>
+      <div class="topbar">
+        <div>
+          <div class="eyebrow">Admin Console · Dev/Test guarded</div>
+          <h2>Manage API access for approved client applications</h2>
+          <p class="subtitle">Create clients, approve scopes through claim invitations, monitor issued keys, and revoke access without storing raw credentials.</p>
+        </div>
+        <div class="actions"><a class="btn btn-secondary" href="/admin/ui/api-keys">View all keys</a><a class="btn btn-primary" href="/admin/ui/api-clients/new">New client</a></div>
+      </div>
+      <div class="grid grid-4">
+        <a class="card metric" href="/admin/ui/api-clients"><div class="label">API Clients</div><div class="value">{dashboard.clientsCount}</div><div class="hint">{dashboard.activeClientsCount} active</div></a>
+        <a class="card metric" href="/admin/ui/api-keys?status=ACTIVE"><div class="label">Active Keys</div><div class="value">{dashboard.activeKeysCount}</div><div class="hint">{dashboard.keysCount} total keys</div></a>
+        <a class="card metric" href="/admin/ui/claim-invitations"><div class="label">Pending Claims</div><div class="value">{dashboard.pendingClaimsCount}</div><div class="hint">Awaiting client-side claim</div></a>
+        <a class="card metric" href="/admin/ui/api-keys?status=ACTIVE&expiresWithinDays=30"><div class="label">Expiring Soon</div><div class="value">{dashboard.expiringSoonCount}</div><div class="hint">Active keys within 30 days</div></a>
+      </div>
+      <div style="height:24px"></div>
+      <section class="card">
+        <div class="card-header"><div><h3>Recent security activity</h3><p>Audit-friendly events without raw secrets or hashes.</p></div><span class="badge">{dashboard.revokedKeysCount} revoked keys</span></div>
+        <div class="card-body activity">
+          {#for event in dashboard.recentActivity}
+          <div class="activity-item"><div class="dot">•</div><div><strong>{event.eventType}</strong><span>{event.eventAt} · client {event.clientId} · key {event.keyId} · by {event.performedBy}</span><span>{event.details}</span></div></div>
+          {#else}
+          <p class="muted">No audit activity has been recorded yet.</p>
+          {/for}
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

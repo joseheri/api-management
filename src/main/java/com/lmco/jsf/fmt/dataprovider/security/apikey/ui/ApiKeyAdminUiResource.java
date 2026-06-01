@@ -3,14 +3,18 @@ package com.lmco.jsf.fmt.dataprovider.security.apikey.ui;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.config.ApiKeySecurityConfig;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.config.DevAdminGuard;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ApiClientResponse;
-import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ApiKeyMetadataResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimInvitationCreatedResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimKeyRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.ClaimKeyResponse;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.CreateApiClientRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.CreateClaimInvitationRequest;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.dto.RevokeApiKeyRequest;
+import com.lmco.jsf.fmt.dataprovider.security.apikey.model.ApiClientStatus;
+import com.lmco.jsf.fmt.dataprovider.security.apikey.model.ApiKeyStatus;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.model.Environment;
+import com.lmco.jsf.fmt.dataprovider.security.apikey.service.ApiKeyAdminViewService;
+import com.lmco.jsf.fmt.dataprovider.security.apikey.service.ApiKeyAdminViewService.ClientFilter;
+import com.lmco.jsf.fmt.dataprovider.security.apikey.service.ApiKeyAdminViewService.KeyFilter;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.service.ApiClientService;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.service.ApiKeyClaimService;
 import com.lmco.jsf.fmt.dataprovider.security.apikey.service.ApiKeyService;
@@ -25,6 +29,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
@@ -54,6 +59,9 @@ public class ApiKeyAdminUiResource {
     private ApiKeyClaimService apiKeyClaimService;
 
     @Inject
+    private ApiKeyAdminViewService adminViewService;
+
+    @Inject
     private DevAdminGuard devAdminGuard;
 
     @Inject
@@ -65,6 +73,10 @@ public class ApiKeyAdminUiResource {
     @Inject
     @Location("api-key-admin/client-list.html")
     private Template clientListTemplate;
+
+    @Inject
+    @Location("api-key-admin/dashboard.html")
+    private Template dashboardTemplate;
 
     @Inject
     @Location("api-key-admin/client-new.html")
@@ -85,6 +97,14 @@ public class ApiKeyAdminUiResource {
     @Inject
     @Location("api-key-admin/key-detail.html")
     private Template keyDetailTemplate;
+
+    @Inject
+    @Location("api-key-admin/key-list.html")
+    private Template keyListTemplate;
+
+    @Inject
+    @Location("api-key-admin/pending-invitations.html")
+    private Template pendingInvitationsTemplate;
 
     @Inject
     @Location("api-key-admin/key-revoke.html")
@@ -108,13 +128,48 @@ public class ApiKeyAdminUiResource {
 
     @GET
     @Path("/admin/ui/api-clients")
-    public Response listClients() {
+    public Response listClients(
+            @QueryParam("search") String search,
+            @QueryParam("status") String status,
+            @QueryParam("hasActiveKeys") boolean hasActiveKeys,
+            @QueryParam("hasPendingInvitations") boolean hasPendingInvitations) {
         Optional<Response> adminFailure = requireDevAdmin();
         if (adminFailure.isPresent()) {
             return adminFailure.get();
         }
-        return html(Response.Status.OK, clientListTemplate
-                .data("clients", apiClientService.listClients()));
+        try {
+            ApiClientStatus clientStatus = parseClientStatus(status);
+            return html(Response.Status.OK, clientListTemplate
+                    .data("clients", adminViewService.listClients(new ClientFilter(
+                            search,
+                            clientStatus,
+                            hasActiveKeys,
+                            hasPendingInvitations)))
+                    .data("search", search)
+                    .data("status", status)
+                    .data("hasActiveKeys", hasActiveKeys)
+                    .data("hasPendingInvitations", hasPendingInvitations)
+                    .data("clientStatuses", ApiClientStatus.values()));
+        } catch (IllegalArgumentException exception) {
+            return adminError(Response.Status.BAD_REQUEST, exception.getMessage());
+        }
+    }
+
+    @GET
+    @Path("/admin/ui")
+    public Response dashboard() {
+        Optional<Response> adminFailure = requireDevAdmin();
+        if (adminFailure.isPresent()) {
+            return adminFailure.get();
+        }
+        return html(Response.Status.OK, dashboardTemplate
+                .data("dashboard", adminViewService.dashboard()));
+    }
+
+    @GET
+    @Path("/admin/ui/dashboard")
+    public Response dashboardAlias() {
+        return dashboard();
     }
 
     @GET
@@ -226,6 +281,52 @@ public class ApiKeyAdminUiResource {
     }
 
     @GET
+    @Path("/admin/ui/api-keys")
+    public Response keyInventory(
+            @QueryParam("search") String search,
+            @QueryParam("status") String status,
+            @QueryParam("environment") String environment,
+            @QueryParam("scope") String scope,
+            @QueryParam("expiresWithinDays") Integer expiresWithinDays) {
+        Optional<Response> adminFailure = requireDevAdmin();
+        if (adminFailure.isPresent()) {
+            return adminFailure.get();
+        }
+        try {
+            ApiKeyStatus keyStatus = parseKeyStatus(status);
+            Environment keyEnvironment = parseEnvironment(environment);
+            return html(Response.Status.OK, keyListTemplate
+                    .data("keys", adminViewService.listKeys(new KeyFilter(
+                            search,
+                            keyStatus,
+                            keyEnvironment,
+                            blankToNull(scope),
+                            expiresWithinDays)))
+                    .data("search", search)
+                    .data("status", status)
+                    .data("environment", environment)
+                    .data("scope", scope)
+                    .data("expiresWithinDays", expiresWithinDays)
+                    .data("keyStatuses", ApiKeyStatus.values())
+                    .data("environments", Environment.values())
+                    .data("scopes", AVAILABLE_SCOPES));
+        } catch (IllegalArgumentException exception) {
+            return adminError(Response.Status.BAD_REQUEST, exception.getMessage());
+        }
+    }
+
+    @GET
+    @Path("/admin/ui/claim-invitations")
+    public Response pendingInvitations() {
+        Optional<Response> adminFailure = requireDevAdmin();
+        if (adminFailure.isPresent()) {
+            return adminFailure.get();
+        }
+        return html(Response.Status.OK, pendingInvitationsTemplate
+                .data("invitations", adminViewService.listPendingInvitations()));
+    }
+
+    @GET
     @Path("/admin/ui/api-keys/{keyId}/revoke")
     public Response revokeKeyForm(@PathParam("keyId") Long keyId) {
         Optional<Response> adminFailure = requireDevAdmin();
@@ -234,9 +335,8 @@ public class ApiKeyAdminUiResource {
         }
 
         try {
-            ApiKeyMetadataResponse key = apiKeyService.getKey(keyId);
             return html(Response.Status.OK, keyRevokeTemplate
-                    .data("key", key));
+                    .data("detail", adminViewService.keyDetail(keyId)));
         } catch (WebApplicationException exception) {
             return adminError(exception);
         }
@@ -256,10 +356,8 @@ public class ApiKeyAdminUiResource {
         try {
             RevokeApiKeyRequest request = new RevokeApiKeyRequest();
             request.setReason(reason);
-            ApiKeyMetadataResponse key = apiKeyService.revokeKey(keyId, request);
-            return html(Response.Status.OK, keyDetailTemplate
-                    .data("key", key)
-                    .data("notice", "API key revoked."));
+            apiKeyService.revokeKey(keyId, request);
+            return keyDetail(keyId, "API key revoked.");
         } catch (WebApplicationException exception) {
             return adminError(exception);
         }
@@ -293,11 +391,8 @@ public class ApiKeyAdminUiResource {
 
     private Response clientDetail(Long clientId, String notice) {
         try {
-            ApiClientResponse client = apiClientService.getClient(clientId);
-            List<ApiKeyMetadataResponse> keys = apiKeyService.listKeysForClient(clientId);
             return html(Response.Status.OK, clientDetailTemplate
-                    .data("client", client)
-                    .data("keys", keys)
+                    .data("detail", adminViewService.clientDetail(clientId))
                     .data("notice", notice));
         } catch (WebApplicationException exception) {
             return adminError(exception);
@@ -306,9 +401,8 @@ public class ApiKeyAdminUiResource {
 
     private Response keyDetail(Long keyId, String notice) {
         try {
-            ApiKeyMetadataResponse key = apiKeyService.getKey(keyId);
             return html(Response.Status.OK, keyDetailTemplate
-                    .data("key", key)
+                    .data("detail", adminViewService.keyDetail(keyId))
                     .data("notice", notice));
         } catch (WebApplicationException exception) {
             return adminError(exception);
@@ -350,6 +444,28 @@ public class ApiKeyAdminUiResource {
     private String required(String value, String fieldName) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(fieldName + " is required");
+        }
+        return value.trim();
+    }
+
+    private ApiClientStatus parseClientStatus(String value) {
+        String trimmed = blankToNull(value);
+        return trimmed == null ? null : ApiClientStatus.valueOf(trimmed.toUpperCase());
+    }
+
+    private ApiKeyStatus parseKeyStatus(String value) {
+        String trimmed = blankToNull(value);
+        return trimmed == null ? null : ApiKeyStatus.valueOf(trimmed.toUpperCase());
+    }
+
+    private Environment parseEnvironment(String value) {
+        String trimmed = blankToNull(value);
+        return trimmed == null ? null : Environment.valueOf(trimmed.toUpperCase());
+    }
+
+    private String blankToNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
         }
         return value.trim();
     }

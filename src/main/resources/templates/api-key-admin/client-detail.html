@@ -2,75 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>API Client {client.id}</title>
-  <link rel="stylesheet" href="/assets/api-key-ui.css">
+  <title>{detail.client.clientName}</title>
+  <link rel="stylesheet" href="/assets/api-key-admin-ui.css">
 </head>
 <body>
-  <header>
-    <h1>{client.clientName}</h1>
-    <div class="nav">
-      <a href="/admin/ui/api-clients">Clients</a>
-      <a href="/admin/ui/api-clients/{client.id}/claim-invitations/new">New Claim Invitation</a>
-      <a href="/key-claim/ui">Claim API Key</a>
-    </div>
-  </header>
-  <main>
-    <p class="warning">Admin UI access currently relies on the dev/test <code>X-Dev-Admin-User</code> header and is not production authentication.</p>
-    {#if notice}
-    <p class="notice">{notice}</p>
-    {/if}
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AK</div><div><h1>API Key Management</h1><p>Admin console</p></div></div>
+      <nav class="nav">
+        <div class="nav-section-title">Admin</div>
+        <a href="/admin/ui">Dashboard</a>
+        <a class="active" href="/admin/ui/api-clients">API Clients</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE">Active Keys</a>
+        <a href="/admin/ui/claim-invitations">Pending Claim Invitations</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE&expiresWithinDays=30">Expiring Keys</a>
+      </nav>
+      <div class="sidebar-note"><strong>Client context</strong><br>You are viewing one API client and its related keys, pending claims, and audit activity.</div>
+    </aside>
+    <main>
+      <div class="topbar">
+        <div>
+          <div class="eyebrow">API Client</div>
+          <h2>{detail.client.clientName}</h2>
+          <p class="subtitle">{detail.client.owner} · {detail.client.contactEmail}</p>
+        </div>
+        <div class="actions"><span class="badge status-{detail.client.status}">{detail.client.status}</span><a class="btn btn-primary" href="/admin/ui/api-clients/{detail.client.id}/claim-invitations/new">Create claim invitation</a></div>
+      </div>
+      {#if notice}<div class="callout green"><strong>Success.</strong><span>{notice}</span></div>{/if}
 
-    <section class="panel">
-      <h2>Client Details</h2>
-      <p><strong>ID:</strong> {client.id}</p>
-      <p><strong>Contact:</strong> {client.contactEmail}</p>
-      <p><strong>Owner:</strong> {client.owner}</p>
-      <p><strong>Status:</strong> {client.status}</p>
-      <p><strong>Created:</strong> {client.createdAt}</p>
-      <p><strong>Updated:</strong> {client.updatedAt}</p>
-    </section>
+      <section class="card">
+        <div class="card-header"><div><h3>Client summary</h3><p>Consuming application/team metadata.</p></div></div>
+        <div class="card-body detail-grid">
+          <div class="detail-item"><div class="label">Client ID</div><div class="value">{detail.client.id}</div></div>
+          <div class="detail-item"><div class="label">Organization / Team</div><div class="value">{detail.client.owner}</div></div>
+          <div class="detail-item"><div class="label">Primary contact</div><div class="value">{detail.client.contactEmail}</div></div>
+          <div class="detail-item"><div class="label">Created</div><div class="value">{detail.client.createdAt}</div></div>
+          <div class="detail-item"><div class="label">Active keys</div><div class="value">{detail.client.activeKeysCount}</div></div>
+          <div class="detail-item"><div class="label">Pending claims</div><div class="value">{detail.client.pendingClaimsCount}</div></div>
+        </div>
+      </section>
 
-    <div class="actions">
-      <a class="button" href="/admin/ui/api-clients/{client.id}/claim-invitations/new">Create Claim Invitation</a>
-    </div>
-
-    <h2>API Keys</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Prefix</th>
-          <th>Environment</th>
-          <th>Status</th>
-          <th>Scopes</th>
-          <th>Expires</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#for key in keys}
-        <tr>
-          <td><a href="/admin/ui/api-keys/{key.id}">{key.id}</a></td>
-          <td>{key.keyName}</td>
-          <td>{key.keyPrefix}</td>
-          <td>{key.environment}</td>
-          <td>{key.status}</td>
-          <td>
-            <div class="scopes">
-              {#for scope in key.scopes}
-              <span class="scope">{scope}</span>
+      <div style="height:24px"></div>
+      <section class="card">
+        <div class="card-header"><div><h3>Keys for this client</h3><p>Raw API keys and hashes are never shown here.</p></div></div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Key</th><th>Environment</th><th>Scopes</th><th>Prefix</th><th>Status</th><th>Expires</th><th>Last used</th><th>Actions</th></tr></thead>
+            <tbody>
+              {#for key in detail.keys}
+              <tr>
+                <td><div class="client-name">{key.keyName}</div><div class="muted small">Key ID {key.id}</div></td>
+                <td><span class="badge env-{key.environment}">{key.environment}</span></td>
+                <td>{#for scope in key.scopes}<span class="badge scope-badge">{scope}</span> {/for}</td>
+                <td><span class="mono">{key.keyPrefix}</span></td>
+                <td><span class="badge status-{key.status}">{key.status}</span></td>
+                <td>{key.expiresAt}</td>
+                <td>{key.lastUsedAt}</td>
+                <td><div class="inline-actions"><a class="btn btn-secondary" href="/admin/ui/api-keys/{key.id}">View</a><a class="btn btn-danger" href="/admin/ui/api-keys/{key.id}/revoke">Revoke</a></div></td>
+              </tr>
+              {#else}
+              <tr><td colspan="8">No API keys have been claimed for this client.</td></tr>
               {/for}
-            </div>
-          </td>
-          <td>{key.expiresAt}</td>
-        </tr>
-        {#else}
-        <tr>
-          <td colspan="7">No API keys have been claimed for this client.</td>
-        </tr>
-        {/for}
-      </tbody>
-    </table>
-  </main>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div style="height:24px"></div>
+      <div class="grid grid-2">
+        <section class="card">
+          <div class="card-header"><div><h3>Pending claim invitations</h3><p>Claim codes are shown once only at creation.</p></div></div>
+          <div class="card-body">
+            {#for invitation in detail.pendingInvitations}
+            <div class="callout blue"><strong>{invitation.keyName}</strong><span>{invitation.approvedEmail} · {invitation.environment} · expires {invitation.expiresAt}</span></div>
+            {#else}
+            <p class="muted">No pending claim invitations for this client.</p>
+            {/for}
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-header"><div><h3>Recent activity</h3><p>Existing audit events for this client.</p></div></div>
+          <div class="card-body activity">
+            {#for event in detail.activity}
+            <div class="activity-item"><div class="dot">•</div><div><strong>{event.eventType}</strong><span>{event.eventAt} · key {event.keyId} · by {event.performedBy}</span><span>{event.details}</span></div></div>
+            {#else}
+            <p class="muted">No activity recorded for this client.</p>
+            {/for}
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

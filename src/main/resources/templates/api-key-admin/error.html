@@ -3,19 +3,26 @@
 <head>
   <meta charset="utf-8">
   <title>Admin UI Error</title>
-  <link rel="stylesheet" href="/assets/api-key-ui.css">
+  <link rel="stylesheet" href="/assets/api-key-admin-ui.css">
 </head>
 <body>
-  <header>
-    <h1>Admin UI</h1>
-    <div class="nav">
-      <a href="/admin/ui/api-clients">Clients</a>
-      <a href="/key-claim/ui">Claim API Key</a>
-    </div>
-  </header>
-  <main>
-    <p class="error">{message}</p>
-    <p class="warning">The temporary admin UI guard requires <code>X-Dev-Admin-User</code> in dev/test and is not production authentication.</p>
-  </main>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AK</div><div><h1>API Key Management</h1><p>Admin console</p></div></div>
+      <nav class="nav">
+        <div class="nav-section-title">Admin</div>
+        <a href="/admin/ui">Dashboard</a>
+        <a href="/admin/ui/api-clients">API Clients</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE">Active Keys</a>
+        <a href="/admin/ui/claim-invitations">Pending Claim Invitations</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE&expiresWithinDays=30">Expiring Keys</a>
+      </nav>
+      <div class="sidebar-note"><strong>Dev/Test guard</strong><br>Use the temporary <code>X-Dev-Admin-User</code> header until SSO / Windows AD is implemented.</div>
+    </aside>
+    <main>
+      <div class="topbar"><div><div class="eyebrow">Admin UI</div><h2>Request could not be completed</h2><p class="subtitle">The admin UI remains protected by the existing dev/test guard.</p></div></div>
+      <div class="callout red"><strong>Error.</strong><span>{message}</span></div>
+    </main>
+  </div>
 </body>
 </html>

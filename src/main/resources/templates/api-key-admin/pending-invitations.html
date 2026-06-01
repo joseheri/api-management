@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Pending Claim Invitations</title>
+  <link rel="stylesheet" href="/assets/api-key-admin-ui.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AK</div><div><h1>API Key Management</h1><p>Admin console</p></div></div>
+      <nav class="nav">
+        <div class="nav-section-title">Admin</div>
+        <a href="/admin/ui">Dashboard</a>
+        <a href="/admin/ui/api-clients">API Clients</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE">Active Keys</a>
+        <a class="active" href="/admin/ui/claim-invitations">Pending Claim Invitations</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE&expiresWithinDays=30">Expiring Keys</a>
+      </nav>
+      <div class="sidebar-note"><strong>No claim codes here</strong><br>Raw claim codes are only shown immediately after invitation creation.</div>
+    </aside>
+    <main>
+      <div class="topbar">
+        <div><div class="eyebrow">Pending Claims</div><h2>Pending claim invitations</h2><p class="subtitle">Invitations waiting for a client-side admin to claim an API key.</p></div>
+      </div>
+      <section class="card">
+        <div class="card-header"><div><h3>Pending invitations</h3><p>Claim codes are never listed after the creation response.</p></div></div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Client</th><th>Organization / Team</th><th>Key name</th><th>Claim identifier</th><th>Environment</th><th>Scopes</th><th>Expires</th><th>Actions</th></tr></thead>
+            <tbody>
+              {#for invitation in invitations}
+              <tr>
+                <td><a class="client-name" href="/admin/ui/api-clients/{invitation.clientId}">{invitation.clientName}</a></td>
+                <td>{invitation.clientOwner}</td>
+                <td>{invitation.keyName}</td>
+                <td>{invitation.approvedEmail}</td>
+                <td><span class="badge env-{invitation.environment}">{invitation.environment}</span></td>
+                <td>{#for scopeName in invitation.scopes}<span class="badge scope-badge">{scopeName}</span> {/for}</td>
+                <td>{invitation.expiresAt}</td>
+                <td><a class="btn btn-secondary" href="/admin/ui/api-clients/{invitation.clientId}">Client details</a></td>
+              </tr>
+              {#else}
+              <tr><td colspan="8">There are no pending claim invitations.</td></tr>
+              {/for}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -2,55 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>New Claim Invitation</title>
-  <link rel="stylesheet" href="/assets/api-key-ui.css">
+  <title>Create Claim Invitation</title>
+  <link rel="stylesheet" href="/assets/api-key-admin-ui.css">
 </head>
 <body>
-  <header>
-    <h1>New Claim Invitation</h1>
-    <div class="nav">
-      <a href="/admin/ui/api-clients">Clients</a>
-      <a href="/admin/ui/api-clients/{client.id}">Client Details</a>
-      <a href="/key-claim/ui">Claim API Key</a>
-    </div>
-  </header>
-  <main>
-    <p class="warning">Admin UI access currently relies on the dev/test <code>X-Dev-Admin-User</code> header and is not production authentication. No email is sent by this workflow.</p>
-    <form class="panel" method="post" action="/admin/ui/api-clients/{client.id}/claim-invitations">
-      <p><strong>Client:</strong> {client.clientName} ({client.contactEmail})</p>
-
-      <label for="approvedEmail">Approved Email / Claim Identifier</label>
-      <input id="approvedEmail" name="approvedEmail" required>
-
-      <label for="keyName">Key Name</label>
-      <input id="keyName" name="keyName" required>
-
-      <label for="environment">Environment</label>
-      <select id="environment" name="environment" required>
-        {#for environment in environments}
-        <option value="{environment}">{environment}</option>
-        {/for}
-      </select>
-
-      <label>Scopes</label>
-      <div class="checkbox-list">
-        {#for scope in scopes}
-        <label><input type="checkbox" name="scopes" value="{scope}"> {scope}</label>
-        {/for}
-      </div>
-
-      <label for="expiresAt">Expires At</label>
-      <input id="expiresAt" name="expiresAt" value="{defaultExpiresAt}" required>
-      <p class="muted">Use an ISO-8601 instant such as <code>{defaultExpiresAt}</code>.</p>
-
-      <label for="approvalReference">Approval Reference</label>
-      <input id="approvalReference" name="approvalReference">
-
-      <div class="actions">
-        <button type="submit">Create Invitation</button>
-        <a class="button secondary" href="/admin/ui/api-clients/{client.id}">Cancel</a>
-      </div>
-    </form>
-  </main>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AK</div><div><h1>API Key Management</h1><p>Admin console</p></div></div>
+      <nav class="nav">
+        <div class="nav-section-title">Admin</div>
+        <a href="/admin/ui">Dashboard</a>
+        <a class="active" href="/admin/ui/api-clients">API Clients</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE">Active Keys</a>
+        <a href="/admin/ui/claim-invitations">Pending Claim Invitations</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE&expiresWithinDays=30">Expiring Keys</a>
+      </nav>
+      <div class="sidebar-note"><strong>No email is sent</strong><br>The claim identifier is username-like. Deliver claim codes manually through the approved process.</div>
+    </aside>
+    <main>
+      <div class="topbar"><div><div class="eyebrow">Step 2</div><h2>Create claim invitation</h2><p class="subtitle">{client.clientName} · approve exactly what the client-side admin may claim later.</p></div></div>
+      <div class="callout blue"><strong>No email is sent.</strong><span>The Approved Email / Claim Identifier is only a claim identifier. Do not use SMTP, magic links, or email verification.</span></div>
+      <section class="card">
+        <div class="card-header"><div><h3>Invitation details</h3><p>The raw claim code will be shown once after creation.</p></div></div>
+        <div class="card-body">
+          <form method="post" action="/admin/ui/api-clients/{client.id}/claim-invitations">
+            <div class="form-grid">
+              <div class="field"><label for="approvedEmail">Approved Email / Claim Identifier</label><input id="approvedEmail" name="approvedEmail" required></div>
+              <div class="field"><label for="keyName">Key name</label><input id="keyName" name="keyName" required></div>
+              <div class="field"><label for="environment">Environment</label><select id="environment" name="environment" required>{#for env in environments}<option value="{env}">{env}</option>{/for}</select></div>
+              <div class="field"><label for="expiresAt">Expiration</label><input id="expiresAt" name="expiresAt" value="{defaultExpiresAt}" required></div>
+              <div class="field full"><label for="approvalReference">Approval reference / ticket</label><input id="approvalReference" name="approvalReference"></div>
+              <div class="field full"><label>Approved scopes</label><div class="check-list">{#for scopeName in scopes}<label class="check"><input type="checkbox" name="scopes" value="{scopeName}"><div><strong>{scopeName}</strong><span>Approved read scope</span></div></label>{/for}</div></div>
+            </div>
+            <div class="footer-actions"><a class="btn btn-secondary" href="/admin/ui/api-clients/{client.id}">Back</a><button type="submit">Create invitation</button></div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>

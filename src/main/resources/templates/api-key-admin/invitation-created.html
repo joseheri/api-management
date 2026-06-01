@@ -3,37 +3,42 @@
 <head>
   <meta charset="utf-8">
   <title>Claim Invitation Created</title>
-  <link rel="stylesheet" href="/assets/api-key-ui.css">
+  <link rel="stylesheet" href="/assets/api-key-admin-ui.css">
 </head>
 <body>
-  <header>
-    <h1>Claim Invitation Created</h1>
-    <div class="nav">
-      <a href="/admin/ui/api-clients">Clients</a>
-      <a href="/admin/ui/api-clients/{invitation.clientId}">Client Details</a>
-      <a href="/key-claim/ui">Claim API Key</a>
-    </div>
-  </header>
-  <main>
-    <p class="warning">Show this claim code once to the approved recipient through an internal out-of-band process. The system does not send email and will not show this code again.</p>
-    <section class="panel">
-      <p><strong>Invitation ID:</strong> {invitation.invitationId}</p>
-      <p><strong>Approved Email / Claim Identifier:</strong> {invitation.approvedEmail}</p>
-      <p><strong>Key Name:</strong> {invitation.keyName}</p>
-      <p><strong>Environment:</strong> {invitation.environment}</p>
-      <p><strong>Expires:</strong> {invitation.expiresAt}</p>
-      <p><strong>Approval Reference:</strong> {invitation.approvalReference}</p>
-      <div class="scopes">
-        {#for scope in invitation.scopes}
-        <span class="scope">{scope}</span>
-        {/for}
-      </div>
-    </section>
-    <h2>One-Time Claim Code</h2>
-    <pre class="secret">{invitation.claimCode}</pre>
-    <div class="actions">
-      <a class="button" href="/admin/ui/api-clients/{invitation.clientId}">Back to Client</a>
-    </div>
-  </main>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AK</div><div><h1>API Key Management</h1><p>Admin console</p></div></div>
+      <nav class="nav">
+        <div class="nav-section-title">Admin</div>
+        <a href="/admin/ui">Dashboard</a>
+        <a href="/admin/ui/api-clients">API Clients</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE">Active Keys</a>
+        <a href="/admin/ui/claim-invitations">Pending Claim Invitations</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE&expiresWithinDays=30">Expiring Keys</a>
+      </nav>
+      <div class="sidebar-note"><strong>Shown once</strong><br>Do not refresh away before the claim code is delivered through the approved out-of-band process.</div>
+    </aside>
+    <main>
+      <div class="topbar"><div><div class="eyebrow">Claim invitation created</div><h2>Share the claim code once</h2><p class="subtitle">{invitation.keyName} · {invitation.approvedEmail}</p></div></div>
+      <div class="callout amber"><strong>This claim code is shown once.</strong><span>Provide it to the client-side admin through the approved out-of-band process. The system does not send email.</span></div>
+      <section class="card">
+        <div class="card-header"><div><h3>One-time claim code</h3><p>The raw claim code is not stored and will not be shown again.</p></div><span class="badge status-PENDING">Shown once</span></div>
+        <div class="card-body">
+          <div class="code-box"><code>{invitation.claimCode}</code></div>
+          <div style="height:18px"></div>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="label">Invitation ID</div><div class="value">{invitation.invitationId}</div></div>
+            <div class="detail-item"><div class="label">Claim identifier</div><div class="value">{invitation.approvedEmail}</div></div>
+            <div class="detail-item"><div class="label">Environment</div><div class="value">{invitation.environment}</div></div>
+            <div class="detail-item"><div class="label">Expires</div><div class="value">{invitation.expiresAt}</div></div>
+            <div class="detail-item"><div class="label">Approval reference</div><div class="value">{invitation.approvalReference}</div></div>
+            <div class="detail-item"><div class="label">Scopes</div><div class="value">{#for scopeName in invitation.scopes}<span class="badge scope-badge">{scopeName}</span> {/for}</div></div>
+          </div>
+          <div class="footer-actions"><a class="btn btn-primary" href="/admin/ui/api-clients/{invitation.clientId}">Return to client</a></div>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>

@@ -3,50 +3,70 @@
 <head>
   <meta charset="utf-8">
   <title>API Clients</title>
-  <link rel="stylesheet" href="/assets/api-key-ui.css">
+  <link rel="stylesheet" href="/assets/api-key-admin-ui.css">
 </head>
 <body>
-  <header>
-    <h1>API Clients</h1>
-    <div class="nav">
-      <a href="/admin/ui/api-clients">Clients</a>
-      <a href="/admin/ui/api-clients/new">New Client</a>
-      <a href="/key-claim/ui">Claim API Key</a>
-    </div>
-  </header>
-  <main>
-    <p class="warning">Admin UI access currently relies on the dev/test <code>X-Dev-Admin-User</code> header and is not production authentication.</p>
-    <div class="actions">
-      <a class="button" href="/admin/ui/api-clients/new">Create API Client</a>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Contact</th>
-          <th>Owner</th>
-          <th>Status</th>
-          <th>Created</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#for client in clients}
-        <tr>
-          <td><a href="/admin/ui/api-clients/{client.id}">{client.id}</a></td>
-          <td>{client.clientName}</td>
-          <td>{client.contactEmail}</td>
-          <td>{client.owner}</td>
-          <td>{client.status}</td>
-          <td>{client.createdAt}</td>
-        </tr>
-        {#else}
-        <tr>
-          <td colspan="6">No API clients found.</td>
-        </tr>
-        {/for}
-      </tbody>
-    </table>
-  </main>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AK</div><div><h1>API Key Management</h1><p>Admin console</p></div></div>
+      <nav class="nav">
+        <div class="nav-section-title">Admin</div>
+        <a href="/admin/ui">Dashboard</a>
+        <a class="active" href="/admin/ui/api-clients">API Clients</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE">Active Keys</a>
+        <a href="/admin/ui/claim-invitations">Pending Claim Invitations</a>
+        <a href="/admin/ui/api-keys?status=ACTIVE&expiresWithinDays=30">Expiring Keys</a>
+      </nav>
+      <div class="sidebar-note"><strong>Dev/Test guard</strong><br>Admin UI requires <code>X-Dev-Admin-User</code>. Final SSO / Windows AD is deferred.</div>
+    </aside>
+    <main>
+      <div class="topbar">
+        <div>
+          <div class="eyebrow">Admin Console</div>
+          <h2>API clients</h2>
+          <p class="subtitle">Applications, teams, and systems approved to receive scoped API access through claim invitations.</p>
+        </div>
+        <div class="actions"><a class="btn btn-primary" href="/admin/ui/api-clients/new">New client</a></div>
+      </div>
+
+      <section class="card">
+        <div class="card-header">
+          <div><h3>Client inventory</h3><p>Filter by text, status, and whether keys or pending claims exist.</p></div>
+        </div>
+        <div class="card-body">
+          <form class="filter-bar" method="get" action="/admin/ui/api-clients">
+            <div class="field"><label for="search">Search</label><input id="search" name="search" value="{search}"></div>
+            <div class="field"><label for="status">Status</label><select id="status" name="status"><option value="">Any</option>{#for clientStatus in clientStatuses}<option value="{clientStatus}">{clientStatus}</option>{/for}</select></div>
+            <label class="check"><input type="checkbox" name="hasActiveKeys" value="true"><div><strong>Has active keys</strong><span>At least one active key</span></div></label>
+            <label class="check"><input type="checkbox" name="hasPendingInvitations" value="true"><div><strong>Has pending claims</strong><span>Invitation waiting to be claimed</span></div></label>
+            <div class="field"><label>&nbsp;</label><button type="submit">Apply filters</button></div>
+          </form>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead>
+              <tr><th>Client</th><th>Organization / Team</th><th>Primary contact</th><th>Status</th><th>Active keys</th><th>Pending claims</th><th>Last used</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              {#for client in clients}
+              <tr>
+                <td><div class="client-name">{client.clientName}</div><div class="muted small">Client ID {client.id}</div></td>
+                <td>{client.owner}</td>
+                <td>{client.contactEmail}</td>
+                <td><span class="badge status-{client.status}">{client.status}</span></td>
+                <td>{client.activeKeysCount}</td>
+                <td>{client.pendingClaimsCount}</td>
+                <td>{client.lastUsedAt}</td>
+                <td><a class="btn btn-secondary" href="/admin/ui/api-clients/{client.id}">View details</a></td>
+              </tr>
+              {#else}
+              <tr><td colspan="8">No API clients match the current filters.</td></tr>
+              {/for}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>

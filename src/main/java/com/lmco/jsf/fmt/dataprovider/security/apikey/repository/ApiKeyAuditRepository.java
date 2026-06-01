@@ -54,6 +54,15 @@ public class ApiKeyAuditRepository {
                 .getResultList();
     }
 
+    public List<ApiKeyAuditEvent> listRecent(int offset, int limit) {
+        return entityManager.createQuery(
+                        "select a from ApiKeyAuditEvent a order by a.eventAt desc, a.id desc",
+                        ApiKeyAuditEvent.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
     public long countByClientId(Long clientId) {
         return entityManager.createQuery(
                         "select count(a) from ApiKeyAuditEvent a where a.clientId = :clientId",
