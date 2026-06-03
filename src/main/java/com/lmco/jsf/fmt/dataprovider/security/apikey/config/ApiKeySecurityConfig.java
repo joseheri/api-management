@@ -15,6 +15,9 @@ public class ApiKeySecurityConfig {
     @ConfigProperty(name = "apikey.header-name", defaultValue = DEFAULT_API_KEY_HEADER)
     private String apiKeyHeaderName;
 
+    @ConfigProperty(name = "apikey.enforcement.mode", defaultValue = "enforce")
+    private String enforcementMode;
+
     @ConfigProperty(name = "apikey.dev-admin.enabled", defaultValue = "false")
     private boolean devAdminEnabled;
 
@@ -27,6 +30,22 @@ public class ApiKeySecurityConfig {
 
     public String getApiKeyHeaderName() {
         return apiKeyHeaderName;
+    }
+
+    public ApiKeyEnforcementMode getEnforcementMode() {
+        return ApiKeyEnforcementMode.fromConfig(enforcementMode);
+    }
+
+    public boolean isEnforcementEnabled() {
+        return getEnforcementMode() == ApiKeyEnforcementMode.ENFORCE;
+    }
+
+    public boolean isReportOnly() {
+        return getEnforcementMode() == ApiKeyEnforcementMode.REPORT_ONLY;
+    }
+
+    public boolean isEnforcementDisabled() {
+        return getEnforcementMode() == ApiKeyEnforcementMode.DISABLED;
     }
 
     public boolean isDevAdminEnabled() {

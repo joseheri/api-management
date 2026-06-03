@@ -18,14 +18,17 @@ import jakarta.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
+import org.jboss.logging.Logger;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class ApiKeyAuthenticationFilter implements ContainerRequestFilter {
 
+    public static final String REPORT_ONLY_INVALID_KEY_PROPERTY = "apikey.report-only.invalid-key";
     public static final String API_KEY_HEADER = "X-API-Key";
     public static final String API_KEY_AUTH_SCHEME = "API_KEY";
     public static final String DEV_ADMIN_AUTH_SCHEME = "DEV_ADMIN";
+    private static final Logger LOG = Logger.getLogger(ApiKeyAuthenticationFilter.class);
 
     @Inject
     private ApiKeySecurityConfig securityConfig;
@@ -60,6 +63,15 @@ public class ApiKeyAuthenticationFilter implements ContainerRequestFilter {
 
         Optional<AuthenticatedApiKey> authenticatedApiKey = apiKeyValidator.authenticate(rawApiKey);
         if (authenticatedApiKey.isEmpty()) {
+            if (!securityConfig.isEnforcementEnabled()) {
+                if (securityConfig.isReportOnly()) {
+                    requestContext.setProperty(REPORT_ONLY_INVALID_KEY_PROPERTY, Boolean.TRUE);
+                    LOG.warnf("API key report-only: request would fail with 401, reason=invalid API key, method=%s, path=%s, correlationId=%s",
+                            requestContext.getMethod(), path, CorrelationIdContext.get());
+                }
+                return;
+            }
+
             abort(requestContext, Response.Status.UNAUTHORIZED, ErrorResponse.ErrorCodes.API_KEY_INVALID,
                     "API key authentication failed");
             return;
